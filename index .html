@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BJones Shopping Company</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: bold header, headline, four-step process, a request builder that writes the email for the customer, contact. */
+  :root {
+    --bg: #f1f3f0;
+    --surface: #e2e8e4;
+    --fg: #15211f;
+    --muted: #556663;
+    --line: #c9d4d0;
+    --accent: #0b5d57;
+    --accent-fg: #ffffff;
+    --signal: #d99a1b;
+    --field: #ffffff;
+    --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --font-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0c1514;
+      --surface: #152220;
+      --fg: #e7efed;
+      --muted: #8fa5a1;
+      --line: #243533;
+      --accent: #4fd1c0;
+      --accent-fg: #0c1514;
+      --signal: #f0b43c;
+      --field: #0f1b1a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0c1514;
+    --surface: #152220;
+    --fg: #e7efed;
+    --muted: #8fa5a1;
+    --line: #243533;
+    --accent: #4fd1c0;
+    --accent-fg: #0c1514;
+    --signal: #f0b43c;
+    --field: #0f1b1a;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.6;
+    padding-block: 0 48px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+  .top {
+    display: flex; flex-wrap: wrap; gap: 12px 24px;
+    justify-content: space-between; align-items: center;
+    padding-block: 18px; border-bottom: 3px solid var(--fg);
+  }
+  .brand {
+    font-family: var(--font-display); font-stretch: 125%; font-weight: 800;
+    font-size: 1.05rem; letter-spacing: 0.01em; text-transform: uppercase;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .brand i { width: 14px; height: 14px; background: var(--signal); display: inline-block; }
+  .top nav { display: flex; gap: 20px; font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .top nav a { text-decoration: none; color: var(--muted); }
+  .top nav a:hover { color: var(--accent); }
+
+  .hero { padding-block: 60px 48px; }
+  .eyebrow {
+    font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 18px;
+  }
+  .hero h1 {
+    font-family: var(--font-display); font-stretch: 125%; font-weight: 800;
+    font-size: clamp(2.1rem, 8vw, 4.2rem); line-height: 1.02;
+    letter-spacing: -0.02em; margin: 0 0 24px; text-wrap: balance; text-transform: uppercase;
+  }
+  .hero p { max-width: 54ch; color: var(--muted); font-size: 1.15rem; margin: 0 0 28px; }
+
+  .btns { display: flex; flex-wrap: wrap; gap: 12px; }
+  .btn {
+    font: inherit; font-weight: 600; font-size: 15px; cursor: pointer; text-decoration: none;
+    display: inline-block; background: var(--accent); color: var(--accent-fg);
+    border: 2px solid var(--accent); border-radius: 4px; padding: 11px 18px;
+  }
+  .btn.ghost { background: transparent; color: var(--fg); border-color: var(--fg); }
+  .btn:hover { filter: brightness(1.1); }
+
+  section { padding-block: 44px; border-top: 1px solid var(--line); }
+  h2 {
+    font-family: var(--font-display); font-stretch: 112%; font-weight: 800;
+    font-size: 1.6rem; line-height: 1.15; margin: 0 0 8px; text-transform: uppercase;
+    letter-spacing: -0.005em;
+  }
+  .lede { margin: 0 0 24px; color: var(--muted); max-width: 56ch; }
+
+  .steps { list-style: none; margin: 0; padding: 0; counter-reset: step; }
+  .steps li {
+    counter-increment: step; display: grid; grid-template-columns: 44px 1fr; gap: 4px 12px;
+    padding: 16px 0; border-top: 1px solid var(--line);
+  }
+  .steps li:first-child { border-top: 0; padding-top: 0; }
+  .steps li::before {
+    content: counter(step); grid-row: span 2;
+    font-family: var(--font-display); font-weight: 800; font-size: 1.8rem; line-height: 1; color: var(--signal);
+  }
+  .steps strong { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; }
+  .steps span { color: var(--muted); }
+
+  .builder { display: grid; grid-template-columns: 1fr; gap: 24px; }
+  @media (min-width: 760px) { .builder { grid-template-columns: 1fr 1fr; } }
+  .builder > * { min-width: 0; }
+  .panel { border: 2px solid var(--fg); border-radius: 4px; overflow: hidden; }
+  .panel-head {
+    background: var(--fg); color: var(--bg); padding: 8px 16px;
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .panel-body { padding: 16px; display: grid; gap: 14px; }
+  .field { display: grid; gap: 4px; }
+  .field label { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .field input, .field textarea {
+    font: inherit; font-size: 16px; color: var(--fg); background: var(--field);
+    border: 1px solid var(--line); border-radius: 4px; padding: 9px 12px; width: 100%;
+  }
+  .field textarea { resize: vertical; min-height: 84px; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .preview {
+    font-family: var(--font-mono); font-size: 13.5px; line-height: 1.55; white-space: pre-wrap;
+    overflow-wrap: anywhere; margin: 0; padding: 16px; background: var(--surface); min-height: 100%;
+  }
+  .preview-wrap { display: grid; grid-template-rows: 1fr auto; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; padding: 14px 16px; border-top: 2px solid var(--fg); }
+  .note { margin: 16px 0 0; color: var(--muted); font-size: 15px; }
+
+  .contact-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .address {
+    font-family: var(--font-mono); font-size: 1.05rem; padding: 11px 16px;
+    background: var(--surface); border-radius: 4px; user-select: all; overflow-wrap: anywhere;
+  }
+
+  footer {
+    padding-top: 28px; border-top: 3px solid var(--fg);
+    font-family: var(--font-mono); font-size: 12px; color: var(--muted);
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    a, .btn { transition: color 0.15s ease, filter 0.15s ease; }
+  }
+</style>
+
+<style>body{margin:0}</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <span class="brand"><i aria-hidden="true"></i>BJones Shopping</span>
+    <nav aria-label="Sections">
+      <a href="#how">How it works</a>
+      <a href="#request">Request</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="hero">
+      <p class="eyebrow">BJones Shopping Company</p>
+      <h1>Tell us what you want. We shop and ship.</h1>
+      <p>Send us the item, your budget and where it should go. We buy it for you and ship it to your door.</p>
+      <div class="btns">
+        <a class="btn" href="#request">Start a request</a>
+        <a class="btn ghost" href="#how">How it works</a>
+      </div>
+    </div>
+
+    <section id="how">
+      <h2>How it works</h2>
+      <p class="lede">Four steps from request to delivery. We never buy anything until you approve the quote.</p>
+      <ol class="steps">
+        <li><strong>Send your request</strong><span>Describe the item, how many you want, your budget and where to deliver.</span></li>
+        <li><strong>We send a quote</strong><span>The quote shows the item cost, our service fee and shipping.</span></li>
+        <li><strong>You approve and pay</strong><span>We purchase after you say yes and your payment is confirmed.</span></li>
+        <li><strong>We buy and ship</strong><span>We send you the shipping details as soon as your order is on its way.</span></li>
+      </ol>
+    </section>
+
+    <section id="request">
+      <h2>Build your request</h2>
+      <p class="lede">Fill in the details and your email writes itself. An example is filled in. Replace it with your own.</p>
+      <div class="builder">
+        <div class="panel">
+          <div class="panel-head">Your details</div>
+          <div class="panel-body">
+            <div class="field">
+              <label for="f-name">Your name</label>
+              <input id="f-name" type="text" value="Jordan Smith" autocomplete="name">
+            </div>
+            <div class="field">
+              <label for="f-item">What should we buy?</label>
+              <textarea id="f-item">Black leather ankle boots, size 8. Product link: (paste it here)</textarea>
+            </div>
+            <div class="pair">
+              <div class="field">
+                <label for="f-qty">Quantity</label>
+                <input id="f-qty" type="text" value="1" inputmode="numeric">
+              </div>
+              <div class="field">
+                <label for="f-budget">Max budget (USD)</label>
+                <input id="f-budget" type="text" value="$120" inputmode="decimal">
+              </div>
+            </div>
+            <div class="field">
+              <label for="f-addr">Deliver to</label>
+              <input id="f-addr" type="text" value="123 Main St, Atlanta, GA 30303" autocomplete="street-address">
+            </div>
+            <div class="field">
+              <label for="f-date">Needed by</label>
+              <input id="f-date" type="text" value="November 15">
+            </div>
+          </div>
+        </div>
+
+        <div class="panel preview-wrap">
+          <div>
+            <div class="panel-head">Your email</div>
+            <pre class="preview" id="preview" aria-live="polite"></pre>
+          </div>
+          <div class="actions">
+            <button class="btn" type="button" id="copy-req">Copy request</button>
+            <a class="btn ghost" id="open-mail" href="mailto:Info@bjoneslogistic.com">Open in email</a>
+          </div>
+        </div>
+      </div>
+      <p class="note" id="req-status" role="status">Send it to Info@bjoneslogistic.com. If the email button does not open your mail app, tap Copy request and paste it into a new message.</p>
+    </section>
+
+    <section id="contact">
+      <h2>Contact</h2>
+      <p class="lede">Questions before you send a request? Email us.</p>
+      <div class="contact-row">
+        <span class="address" id="address">Info@bjoneslogistic.com</span>
+        <button class="btn" type="button" id="copy">Copy address</button>
+      </div>
+      <p class="note" id="status" role="status"></p>
+    </section>
+  </main>
+
+  <footer>
+    <span>&copy; 2026 BJones Shopping Company</span>
+    <span>Info@bjoneslogistic.com</span>
+  </footer>
+</div>
+
+<script>
+  (function () {
+    var EMAIL = "Info@bjoneslogistic.com";
+    var ids = ["f-name", "f-item", "f-qty", "f-budget", "f-addr", "f-date"];
+    var el = {};
+    ids.forEach(function (id) { el[id] = document.getElementById(id); });
+    var preview = document.getElementById("preview");
+    var openMail = document.getElementById("open-mail");
+    var reqStatus = document.getElementById("req-status");
+
+    function val(id) {
+      var v = el[id].value.trim();
+      return v ? v : "(not provided)";
+    }
+    function build() {
+      return [
+        "Hello BJones Shopping Company,",
+        "",
+        "I would like you to shop for me.",
+        "",
+        "Name: " + val("f-name"),
+        "Item: " + val("f-item"),
+        "Quantity: " + val("f-qty"),
+        "Max budget: " + val("f-budget"),
+        "Deliver to: " + val("f-addr"),
+        "Needed by: " + val("f-date"),
+        "",
+        "Please send me a quote before buying anything.",
+        "",
+        "Thank you,",
+        el["f-name"].value.trim() || "(name)"
+      ].join("\n");
+    }
+    function refresh() {
+      var text = build();
+      preview.textContent = text;
+      openMail.href = "mailto:" + EMAIL + "?subject=" + encodeURIComponent("Shopping request") + "&body=" + encodeURIComponent(text);
+    }
+    ids.forEach(function (id) { el[id].addEventListener("input", refresh); });
+    refresh();
+
+    function selectNode(node, statusEl, msg) {
+      var r = document.createRange();
+      r.selectNodeContents(node);
+      var s = window.getSelection();
+      s.removeAllRanges();
+      s.addRange(r);
+      statusEl.textContent = msg;
+    }
+    function copy(text, node, statusEl, okMsg) {
+      var fallback = function () { selectNode(node, statusEl, "Text selected. Use your device's copy command."); };
+      try {
+        navigator.clipboard.writeText(text).then(function () { statusEl.textContent = okMsg; }, fallback);
+      } catch (e) { fallback(); }
+    }
+
+    document.getElementById("copy-req").addEventListener("click", function () {
+      copy(build(), preview, reqStatus, "Request copied. Paste it into an email to " + EMAIL + ".");
+    });
+    var address = document.getElementById("address");
+    var status = document.getElementById("status");
+    document.getElementById("copy").addEventListener("click", function () {
+      copy(address.textContent, address, status, "Copied " + address.textContent);
+    });
+  })();
+</script>
+</body>
+</html>
